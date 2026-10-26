@@ -490,7 +490,7 @@ Không mất 20-30% hoa hồng phí nền tảng như các trang GrabFood,Shopee
           <li>QR Thanh toán Chuyển Khoản</li>
           <li>Thống kê doanh thu tự động</li>
         </ul>
-        <button class="price-btn price-btn-secondary">Đăng ký ngay</button>
+        <button class="price-btn price-btn-secondary" onclick="openModal('Starter')">Đăng ký ngay</button>
       </div>
 
       <!-- Professional -->
@@ -512,7 +512,7 @@ Không mất 20-30% hoa hồng phí nền tảng như các trang GrabFood,Shopee
           <li>Thống kê doanh thu tự động</li>
           <li>Quản lý nhiều nhân viên</li>
         </ul>
-        <button class="price-btn price-btn-primary">Đăng ký ngay</button>
+        <button class="price-btn price-btn-primary" onclick="openModal('Professional')">Đăng ký ngay</button>
       </div>
 
       <!-- Enterprise -->
@@ -534,7 +534,7 @@ Không mất 20-30% hoa hồng phí nền tảng như các trang GrabFood,Shopee
           <li>Báo cáo nâng cao</li>
           <li>Hỗ trợ riêng 24/7</li>
         </ul>
-        <button class="price-btn price-btn-secondary">Đăng ký ngay</button>
+        <button class="price-btn price-btn-secondary" onclick="openModal('Enterprise')">Đăng ký ngay</button>
       </div>
     </div>
   </div>
@@ -678,6 +678,79 @@ Không mất 20-30% hoa hồng phí nền tảng như các trang GrabFood,Shopee
     const btn = document.getElementById('float-btn');
     btn.classList.toggle('show', window.scrollY > 500);
   }, { passive: true });
+</script>
+  <!-- Cửa sổ Popup Đăng ký -->
+<div id="registerModal" class="modal-overlay">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3 style="font-family:'Lexend',sans-serif; margin-bottom:15px; font-size: 1.2rem;">
+      Đăng ký gói <span id="packageNameDisplay" style="color:#FF6B35;"></span>
+    </h3>
+    <form id="registerForm">
+      <input type="hidden" id="packageInput" name="package">
+      <input type="text" name="name" class="modal-input" placeholder="Tên quán / Tên của bạn" required>
+      <input type="tel" name="phone" class="modal-input" placeholder="Số điện thoại / Zalo" required>
+      <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;" id="submitBtn">
+        Gửi thông tin
+      </button>
+    </form>
+    <div id="formMessage" style="display:none; color:#10b981; font-weight:600; margin-top:15px; text-align:center;">
+      🎉 Gửi thành công! Chúng tôi sẽ liên hệ qua Zalo sớm nhất.
+    </div>
+  </div>
+</div>
+
+<style>
+  /* CSS cho Popup */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+  .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-in-out; }
+  .modal-content { background: #fff; padding: 2rem; border-radius: 1.5rem; width: 90%; max-width: 400px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+  .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; font-weight: bold; color: #64748b; cursor: pointer; }
+  .close-btn:hover { color: #0F172A; }
+  .modal-input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid #e5e7eb; border-radius: 0.75rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+  .modal-input:focus { border-color: #FF6B35; }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+</style>
+
+<script>
+  // Script điều khiển Popup và Gửi Google Sheets
+  // BẠN SẼ THAY SCRIPT URL NÀY Ở BƯỚC 3
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzF20MA3afplX2_bP9LNr-w7Fs-n0IFYdO2a2yv8DmZy3BcCQ6ZM9QM5Q9GJp6lyD_c/exec"; 
+
+  function openModal(pkg) {
+    document.getElementById('registerModal').classList.add('active');
+    document.getElementById('packageNameDisplay').innerText = pkg;
+    document.getElementById('packageInput').value = pkg;
+  }
+
+  function closeModal() {
+    document.getElementById('registerModal').classList.remove('active');
+    document.getElementById('formMessage').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('registerForm').reset();
+  }
+
+  const form = document.getElementById('registerForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = 'Đang gửi...';
+    btn.disabled = true;
+
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+      .then(response => {
+        form.style.display = 'none';
+        document.getElementById('formMessage').style.display = 'block';
+        btn.innerText = 'Gửi thông tin';
+        btn.disabled = false;
+        setTimeout(closeModal, 4000); // Tự đóng sau 4 giây
+      })
+      .catch(error => {
+        alert('Lỗi! Vui lòng thử lại sau.');
+        btn.innerText = 'Gửi thông tin';
+        btn.disabled = false;
+      });
+  });
 </script>
 </body>
 </html>
